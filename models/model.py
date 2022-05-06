@@ -1,23 +1,36 @@
 import tensorflow.keras.regularizers
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Flatten, Dense, Input, Dropout, MaxPooling2D, Conv2D, BatchNormalization
-from tensorflow.keras.applications import ResNet50, ResNet50V2
+from tensorflow.keras.applications import ResNet50, ResNet50V2, VGG16, InceptionResNetV2
 
 
 # Resnet 50
-def resnet_50(input_tensor, input_shape, weights, pooling):
+def resnet_50(input_tensor, input_shape, weights):
     base = ResNet50(weights=weights, input_tensor=input_tensor, include_top=False, input_shape=input_shape)
+    base.trainable = False
+    return base
+
+
+def resnet_50_v2(input_tensor, input_shape, weights):
+    base = ResNet50V2(weights=weights, input_tensor=input_tensor, include_top=False, input_shape=input_shape)
+    base.trainable = False
+    return base
+
+
+def vgg_16(input_tensor, input_shape, weights):
+    base = VGG16(weights=weights, input_tensor=input_tensor, include_top=False, input_shape=input_shape)
+    base.trainable = False
+    return base
+
+
+def inception_res(input_tensor, input_shape, weights):
+    base = InceptionResNetV2(weights=weights, input_tensor=input_tensor, include_top=False, input_shape=input_shape)
     base.trainable = False
     return base
 
 
 # Resnet 50 v2
 # input_tensor = Input(shape=(100, 100, 1))
-
-def resnet_50_v2(input_tensor, input_shape, weights):
-    base = ResNet50V2(weights=weights, input_tensor=input_tensor, include_top=False, input_shape=input_shape)
-    base.trainable = False
-    return base
 
 
 # Feed forward
@@ -30,7 +43,7 @@ def fully_connected(num_classes):
     model.add(Dense(1024, activation='relu'))
     model.add(Dropout(0.2))
     model.add(Dense(1024, activation='relu'))
-    model.add(Dropout(0.2))
+    # model.add(Dropout(0.2))
     # model.add(Dense(64, activation='relu'))
     model.add(Dense(num_classes, activation='softmax'))
     return model
@@ -73,23 +86,20 @@ def build_net(num_classes, input_shape):
     """
     model = Sequential(name='DCNN')
 
-    model.add(
-        Conv2D(
-            filters=64,
-            kernel_size=(5, 5),
-            input_shape=input_shape,
-            activation='elu',
-            padding='same',
-            kernel_initializer='he_normal',
-            name='conv2d_1'
-        )
-    )
+    model.add(Conv2D(filters=64,
+                     kernel_size=(5, 5),
+                     input_shape=input_shape,
+                     activation='relu', padding='same',
+                     kernel_initializer='he_normal',
+                     name='conv2d_1'
+                     )
+              )
     model.add(BatchNormalization(name='batchnorm_1'))
     model.add(
         Conv2D(
             filters=64,
             kernel_size=(5, 5),
-            activation='elu',
+            activation='relu',
             padding='same',
             kernel_initializer='he_normal',
             name='conv2d_2'
@@ -104,7 +114,7 @@ def build_net(num_classes, input_shape):
         Conv2D(
             filters=128,
             kernel_size=(3, 3),
-            activation='elu',
+            activation='relu',
             padding='same',
             kernel_initializer='he_normal',
             name='conv2d_3'
@@ -115,7 +125,7 @@ def build_net(num_classes, input_shape):
         Conv2D(
             filters=128,
             kernel_size=(3, 3),
-            activation='elu',
+            activation='relu',
             padding='same',
             kernel_initializer='he_normal',
             name='conv2d_4'
@@ -130,7 +140,7 @@ def build_net(num_classes, input_shape):
         Conv2D(
             filters=256,
             kernel_size=(3, 3),
-            activation='elu',
+            activation='relu',
             padding='same',
             kernel_initializer='he_normal',
             name='conv2d_5'
@@ -141,7 +151,7 @@ def build_net(num_classes, input_shape):
         Conv2D(
             filters=256,
             kernel_size=(3, 3),
-            activation='elu',
+            activation='relu',
             padding='same',
             kernel_initializer='he_normal',
             name='conv2d_6'
@@ -157,14 +167,14 @@ def build_net(num_classes, input_shape):
     model.add(
         Dense(
             128,
-            activation='elu',
+            activation='relu',
             kernel_initializer='he_normal',
             name='dense_1'
         )
     )
     model.add(BatchNormalization(name='batchnorm_7'))
 
-    model.add(Dropout(0.6, name='dropout_4'))
+    model.add(Dropout(0.2, name='dropout_4'))
 
     model.add(
         Dense(

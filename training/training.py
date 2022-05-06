@@ -13,9 +13,9 @@ random.seed(89)
 seed(25)
 tf.random.set_seed(40)
 
-EPOCHS = 100
+EPOCHS = 10
 INPUT_SHAPE = (200, 200, 3)
-BATCH_SIZE = 8
+BATCH_SIZE = 32
 NUM_CLASSES = 5
 VAL_SPLIT = 0.2
 IMG_BASE_PATH = "C:/Users/Administrator/Desktop/datasets/UTKface_Aligned_cropped/UTKFace/UTKFace/"
@@ -30,7 +30,8 @@ TEST_LABELS = []
 """
 White(0), Black(1), Asian(2), Indian(3), Others(4) 
 """
-LABELS = [0, 1, 2, 3, 4]
+# LABELS = [0, 1, 2, 3, 4]
+LABELS = ["White", "Black", "Asian", "Indian", "Others"]
 
 print("Loading training data")
 # Load the data and labels
@@ -96,14 +97,15 @@ callbacks = create_callbacks()  # BEST_MODEL_PATH + name + file_ext, "loss", "mi
 # build model
 print("Building model")
 input_tensor = Input(shape=INPUT_SHAPE)
-# _resnet_base = resnet_50(input_tensor, INPUT_SHAPE, None, None)
+# _base = vgg_16(input_tensor, INPUT_SHAPE, "imagenet")
 # _fully_connected = fully_connected(NUM_CLASSES)
-# model = build_model(_resnet_base, _fully_connected)
+# net = build_model(_base, _fully_connected)
+
 net = build_net(NUM_CLASSES, INPUT_SHAPE)
 
 opts = [
     Nadam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, name='Nadam'),
-    Adam(learning_rate=0.0001),
+    Adam(learning_rate=0.001),
 ]
 
 # model = build_net(4)
@@ -123,12 +125,15 @@ print("Evaluating model")
 acc = net.evaluate(TEST_DATA, TEST_LABELS, batch_size=BATCH_SIZE)
 preds = net.predict(TEST_DATA, verbose=0)
 preds = np.argmax(preds, axis=1)
+
 model_loss_path = "../graphs/" + name + "_loss.png"
 model_acc_path = "../graphs/" + name + "_acc.png"
 model_cm_path = "../graphs/" + name + "_cm.png"
+model_metrics_path = "../results/" + name + "_metrics.txt"
+
+print("Saving results")
 plot_confusion_matrix(TEST_LABELS, preds, LABELS, name, model_cm_path)
 acc_loss_graphs_to_file(name, history, ['train', 'val'], 'upper left', model_loss_path, model_acc_path)
-model_metrics_path = "../results/" + name + "_metrics.txt"
 metrics_to_file(name, model_metrics_path, TEST_LABELS, preds, LABELS, acc)
 
 print("Done!")

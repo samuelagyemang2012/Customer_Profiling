@@ -1,0 +1,18 @@
+race
+*Classification Report*
+              precision    recall  f1-score   support
+
+       White       0.89      0.00      0.01      1825
+       Black       0.78      0.74      0.76       796
+       Asian       0.97      0.11      0.20       646
+      Indian       0.42      0.75      0.54       713
+      Others       0.08      0.61      0.14       288
+
+    accuracy                           0.32      4268
+   macro avg       0.63      0.44      0.33      4268
+weighted avg       0.75      0.32      0.28      4268
+
+Accuracy: 0.3238050639629364
+Recall: 0.323805060918463
+Precision: 0.323805060918463
+F1_score: 0.323805060918463

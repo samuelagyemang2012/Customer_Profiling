@@ -18,7 +18,7 @@ EPOCHS = 30
 INPUT_SHAPE = (200, 200, 3)
 BATCH_SIZE = 64
 VAL_SPLIT = 0.2
-IMG_BASE_PATH = "C:/Users/Administrator/Desktop/datasets/UTKface_Aligned_cropped/UTKFace/UTKFace/"
+IMG_BASE_PATH = "D:/Datasets/UTKFace/"
 TRAIN_DATA_PATH = "../data/train.csv"
 TEST_DATA_PATH = "../data/test.csv"
 VAL_DATA_PATH = "../data/val.csv"
@@ -126,22 +126,13 @@ callbacks = create_callbacks()  # BEST_MODEL_PATH + name + file_ext, "loss", "mi
 # build model
 print("Building model")
 input_tensor = Input(shape=INPUT_SHAPE)
-
-# _base = vgg_16(input_tensor, INPUT_SHAPE, "imagenet")
-# _fully_connected = fully_connected(NUM_CLASSES)
-# net = build_model(_base, _fully_connected)
-
-# net = mobilenet(input_tensor, INPUT_SHAPE, NUM_CLASSES)
-# net = my_net(NUM_CLASSES, INPUT_SHAPE)
-net = my_net2(NUM_CLASSES, INPUT_SHAPE)
-
-opts = [
-    Nadam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, name='Nadam'),
-    Adam(learning_rate=0.001),
-]
+base = base_net(INPUT_SHAPE)
+head = race_head(NUM_CLASSES)
+net = build_model(base, head)
+opt = Adam(learning_rate=0.001)
 
 # model = build_net(4)
-net.compile(optimizer=opts[1], loss="categorical_crossentropy", metrics=['accuracy'])
+net.compile(optimizer=opt, loss="categorical_crossentropy", metrics=['accuracy'])
 net.summary()
 
 # train model

@@ -121,22 +121,12 @@ callbacks = create_callbacks()  # BEST_MODEL_PATH + name + file_ext, "loss", "mi
 # build model
 print("Building model")
 input_tensor = Input(shape=INPUT_SHAPE)
+base = base_net(INPUT_SHAPE)
+head = gender_head(NUM_CLASSES)
+net = build_model(base, head)
+opt = Adam(learning_rate=0.001)
 
-# _base = vgg_16(input_tensor, INPUT_SHAPE, "imagenet")
-# _fully_connected = fully_connected(NUM_CLASSES)
-# net = build_model(_base, _fully_connected)
-
-# net = mobilenet(input_tensor, INPUT_SHAPE, NUM_CLASSES)
-# net = my_net(NUM_CLASSES, INPUT_SHAPE)
-net = my_net2(NUM_CLASSES, INPUT_SHAPE)
-
-opts = [
-    Nadam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, name='Nadam'),
-    Adam(learning_rate=0.001),
-]
-
-# model = build_net(4)
-net.compile(optimizer=opts[1], loss="binary_crossentropy", metrics=['accuracy'])
+net.compile(optimizer=opt, loss="binary_crossentropy", metrics=['accuracy'])
 net.summary()
 
 # train model

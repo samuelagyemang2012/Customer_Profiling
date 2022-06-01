@@ -85,6 +85,27 @@ def create_callbacks():  # (best_model_path, monitor, mode, patience):
     return callbacks
 
 
+def create_callbacks_reg():  # (best_model_path, monitor, mode, patience):
+    es = EarlyStopping(
+        monitor='val_mse',
+        min_delta=0.00005,
+        patience=11,
+        verbose=1,
+        restore_best_weights=True,
+    )
+    # lr_scheduler = ReduceLROnPlateau(
+    #     monitor='val_accuracy',
+    #     factor=0.5,
+    #     patience=7,
+    #     min_lr=1e-7,
+    #     verbose=1,
+    # )
+
+    # mc = ModelCheckpoint(best_model_path, monitor=monitor, mode=mode, verbose=1, save_best_only=True)
+    callbacks = [es]  # , lr_scheduler]  # , mc]
+    return callbacks
+
+
 def write_to_file(data, path):
     f = open(path, "w")
     f.write(data)

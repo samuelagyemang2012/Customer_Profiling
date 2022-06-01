@@ -133,8 +133,16 @@ def gender_head(num_classes):
     return model
 
 
-def age_head(num_classes):
-    pass
+def age_head():
+    model = Sequential()
+    model.add(Dense(256, activation='relu'))
+    model.add(Dense(160, activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    # model.add(Dense(32, activation='relu'))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.5))
+    model.add(Dense(1, activation='linear'))
+    return model
 
 
 def build_model(base, forward):

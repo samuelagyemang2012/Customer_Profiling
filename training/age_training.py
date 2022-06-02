@@ -7,6 +7,7 @@ from evaluation.evaluation import *
 from tensorflow.keras.utils import to_categorical
 from models.model import *
 import pickle
+from sklearn.metrics import mean_squared_error, r2_score
 from numpy.random import seed
 from sklearn.preprocessing import MinMaxScaler
 import random
@@ -87,12 +88,15 @@ TEST_DATA = TEST_DATA.astype('float32')
 # one-hot encode labels
 print("Scale ages")
 scaler = MinMaxScaler(feature_range=(0, 1))
-train_labels = scaler.fit_transform(np.asarray(train_labels).reshape(-1, 1))
-test_labels = scaler.fit_transform(np.asarray(test_labels).reshape(-1, 1))
+TRAIN_LABELS = scaler.fit_transform(np.asarray(train_labels).reshape(-1, 1))
+VAL_LABELS = scaler.fit_transform(np.asarray(val_labels).reshape(-1, 1))
+TEST_LABELS = scaler.fit_transform(np.asarray(test_labels).reshape(-1, 1))
 
-TRAIN_LABELS = to_categorical(train_labels)
-VAL_LABELS = to_categorical(val_labels)
-TEST_LABELS = to_categorical(test_labels)
+print("Saving scaler")
+scaler_path = "../scaler/scaler.pkl"
+with open(scaler_path, 'wb') as file:
+    # A new file will be created
+    pickle.dump(scaler, file)
 
 # data augmentation
 print("Augmenting data")
@@ -116,16 +120,14 @@ TEST_DATA = np.reshape(TEST_DATA, (len(TEST_DATA), INPUT_SHAPE[0], INPUT_SHAPE[1
 
 train_gen = train_datagen.flow(TRAIN_DATA, TRAIN_LABELS, batch_size=BATCH_SIZE)
 val_gen = val_datagen.flow(VAL_DATA, VAL_LABELS, batch_size=BATCH_SIZE)
-# test_gen = test_datagen.flow(TEST_DATA)
-
 
 # setup callbacks
 print("Setting up callbacks")
 file_ext = ".h5"
 name = "age"
 callbacks = create_callbacks_reg()  # BEST_MODEL_PATH + name + file_ext, "loss", "min", 5)
-
-# build model
+#
+# # build model
 print("Building model")
 input_tensor = Input(shape=INPUT_SHAPE)
 base = base_net(INPUT_SHAPE)
@@ -146,20 +148,24 @@ history = net.fit(train_gen,
 # evaluate model
 print("Evaluating model")
 acc = net.evaluate(TEST_DATA, TEST_LABELS, batch_size=BATCH_SIZE)
-print(acc)
-# acc2 = net.evaluate(test_gen)
-# print(acc2)
-# preds = net.predict(TEST_DATA, verbose=0)
-# preds = np.argmax(preds, axis=1)
-#
-# model_loss_path = "../graphs/" + name + "_loss.png"
-# model_acc_path = "../graphs/" + name + "_acc.png"
-# model_cm_path = "../graphs/" + name + "_cm.png"
-# model_metrics_path = "../results/" + name + "_metrics.txt"
-#
-# print("Saving results")
-# plot_confusion_matrix(TEST_LABELS, preds, LABELS, name, model_cm_path)
-# acc_loss_graphs_to_file(name, history, ['train', 'val'], 'upper left', model_loss_path, model_acc_path)
-# metrics_to_file(name, model_metrics_path, TEST_LABELS, preds, LABELS, acc)
-#
-# print("Done!")
+preds = net.predict(TEST_DATA, verbose=0)
+
+mse = mean_squared_error(TEST_LABELS, preds)
+r2 = r2_score(TEST_LABELS, preds)
+rmse = np.sqrt(mean_squared_error(TEST_LABELS, preds))
+
+print("MSE: ", mse)
+print("R2: ", r2)
+print("RMSE: ", rmse)
+
+# # model_loss_path = "../graphs/" + name + "_loss.png"
+# # model_acc_path = "../graphs/" + name + "_acc.png"
+# # model_cm_path = "../graphs/" + name + "_cm.png"
+# # model_metrics_path = "../results/" + name + "_metrics.txt"
+# #
+# # print("Saving results")
+# # plot_confusion_matrix(TEST_LABELS, preds, LABELS, name, model_cm_path)
+# # acc_loss_graphs_to_file(name, history, ['train', 'val'], 'upper left', model_loss_path, model_acc_path)
+# # metrics_to_file(name, model_metrics_path, TEST_LABELS, preds, LABELS, acc)
+# #
+# # print("Done!")

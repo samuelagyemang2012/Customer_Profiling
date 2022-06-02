@@ -158,14 +158,13 @@ print("MSE: ", mse)
 print("R2: ", r2)
 print("RMSE: ", rmse)
 
-# # model_loss_path = "../graphs/" + name + "_loss.png"
-# # model_acc_path = "../graphs/" + name + "_acc.png"
-# # model_cm_path = "../graphs/" + name + "_cm.png"
-# # model_metrics_path = "../results/" + name + "_metrics.txt"
-# #
-# # print("Saving results")
-# # plot_confusion_matrix(TEST_LABELS, preds, LABELS, name, model_cm_path)
-# # acc_loss_graphs_to_file(name, history, ['train', 'val'], 'upper left', model_loss_path, model_acc_path)
-# # metrics_to_file(name, model_metrics_path, TEST_LABELS, preds, LABELS, acc)
-# #
-# # print("Done!")
+scores = "MSE: " + str(mse) + "\n" + "R2: " + str(r2) + "\n" + "RMSE: " + str(rmse)
+
+model_loss_path = "/content/graphs/" + name + "_loss.png"
+model_mse_path = "/content/graphs/" + name + "_mse.png"
+model_metrics_path = "/content/results" + name + "_metrics.txt"
+
+print("Saving results")
+write_to_file(data=scores, path=model_metrics_path)
+reg_loss_graphs_to_file(name, history, ['train', 'val'], 'upper left', model_loss_path, model_mse_path)
+print("Done!")

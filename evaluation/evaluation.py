@@ -53,6 +53,17 @@ def acc_loss_graphs_to_file(model_name, history, legend, legend_loc, loss_path, 
     draw_training_graphs(acc_title, train_acc, val_acc, "epochs", "accuracy", legend, legend_loc, acc_path)
 
 
+def reg_loss_graphs_to_file(model_name, history, legend, legend_loc, loss_path, mse_path):
+    loss_title = model_name + " Loss Graph"
+    mse_title = model_name + " MSE Graph"
+    train_mse = history.history['mse']
+    val_mse = history.history['val_mse']
+    train_loss = history.history['loss']
+    val_loss = history.history['val_loss']
+    draw_training_graphs(loss_title, train_loss, val_loss, "epochs", "loss", legend, legend_loc, loss_path)
+    draw_training_graphs(mse_title, train_mse, val_mse, "epochs", "accuracy", legend, legend_loc, mse_path)
+
+
 def draw_training_graphs(title, train_hist, val_hist, x_label, y_label, legend, loc, path):
     plt.plot(train_hist)
     plt.plot(val_hist)
